@@ -17,7 +17,7 @@ module Data.X509.DistinguishedName
 
 import Control.Applicative
 import Data.Monoid
-import Data.Semigroups
+import Data.Semigroup
 import Data.ASN1.Types
 import Data.X509.Internal
 
@@ -50,7 +50,7 @@ getDnElement element (DistinguishedName els) = lookup (getObjectID element) els
 newtype DistinguishedNameInner = DistinguishedNameInner DistinguishedName
     deriving (Show,Eq)
 
-instance Semigroups DistinguishedName where
+instance Semigroup DistinguishedName where
     (<>) (DistinguishedName l1) (DistinguishedName l2) = DistinguishedName (l1++l2)
 
 instance Monoid DistinguishedName where
