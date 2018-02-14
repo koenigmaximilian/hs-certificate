@@ -11,6 +11,7 @@ import Data.Char (isDigit, isHexDigit)
 import Data.Either (rights)
 import Data.List (foldl', isPrefixOf)
 import Data.Monoid
+import Data.Semigroup
 import Data.PEM (pemParseBS, pemContent)
 import Data.X509
 import qualified Data.Map as M
@@ -28,10 +29,13 @@ data CertificateStore = CertificateStore (M.Map DistinguishedName SignedCertific
 
 instance Monoid CertificateStore where
     mempty  = CertificateStore M.empty
-    mappend s1@(CertificateStore _)   s2@(CertificateStore _) = CertificateStores [s1,s2]
-    mappend    (CertificateStores l)  s2@(CertificateStore _) = CertificateStores (l ++ [s2])
-    mappend s1@(CertificateStore _)   (CertificateStores l)   = CertificateStores ([s1] ++ l)
-    mappend    (CertificateStores l1) (CertificateStores l2)  = CertificateStores (l1 ++ l2)
+    mappend = (<>)
+    
+instance Semigroup CertificateStore where
+    (<>) s1@(CertificateStore _)   s2@(CertificateStore _) = CertificateStores [s1,s2]
+    (<>)    (CertificateStores l)  s2@(CertificateStore _) = CertificateStores (l ++ [s2])
+    (<>) s1@(CertificateStore _)   (CertificateStores l)   = CertificateStores ([s1] ++ l)
+    (<>)    (CertificateStores l1) (CertificateStores l2)  = CertificateStores (l1 ++ l2)
 
 -- | Create a certificate store out of a list of X509 certificate
 makeCertificateStore :: [SignedCertificate] -> CertificateStore
